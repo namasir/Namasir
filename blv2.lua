@@ -255,7 +255,7 @@ Tab:AddSlider({
 local shootSpeedSlider = Tab:AddSlider({
     Name = "กำหนดความแรงการยิง",
     Min = 20,
-    Max = 500,
+    Max = 350,
     Default = 20,
     Color = Color3.fromRGB(255, 255, 255),
     Increment = 1,
