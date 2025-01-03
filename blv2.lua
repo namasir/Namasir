@@ -251,32 +251,45 @@ Tab:AddSlider({
 	end    
 })
 
--- สร้าง slider สำหรับตั้งค่าความเร็วการยิง
-local shootSpeedSlider = Tab:AddSlider({
-    Name = "กำหนดความแรงการยิง",
-    Min = 20,
-    Max = 350,
-    Default = 20,
-    Color = Color3.fromRGB(255, 255, 255),
-    Increment = 1,
-    ValueName = "Speed",
-    Callback = function(Value)
-        -- ปรับค่าความเร็วที่แสดงเมื่อ slider เปลี่ยนค่า
-        print("Shoot speed set to: " .. Value)
-    end    
-})
-
--- สร้างปุ่มยิงบอล
 Tab:AddButton({
     Name = "F1 เพื่อยิง",
     Callback = function()
-        local speed = shootSpeedSlider.Value or 300
-        local ballPosition = Vector3.new(0, -50, -100)
-        local params = { speed, ballPosition }
-        
-        game:GetService("ReplicatedStorage"):WaitForChild("Packages"):WaitForChild("Kit"):WaitForChild("Services"):WaitForChild("BallService"):WaitForChild("RE"):WaitForChild("Shoot"):FireServer(unpack(params))
-        print("Ball shot with speed: " .. speed)
+        shootBall()  -- This will call the shootBall function when the button is clicked
     end    
 })
 
-Tab = Window:MakeTab({Name = "Soon..... รออัพเดตนาจา",})
+-- กำหนดแรงยิงด้วย Slider
+local shootVelocity = 300 -- ค่าเริ่มต้นของแรงยิง
+Tab:AddSlider({
+    Name = "Slider",
+    Min = 20,
+    Max = 300, -- กำหนดค่า Max ของแรงยิง
+    Default = 20, -- ค่าเริ่มต้นของ Slider
+    Color = Color3.fromRGB(255, 255, 255),
+    Increment = 10, -- ปรับค่าทีละ 10
+    ValueName = "Velocity",
+    Callback = function(Value)
+        shootVelocity = Value
+        print("Set shoot velocity to: " .. shootVelocity)
+    end    
+})
+
+-- ฟังก์ชันสำหรับยิงบอล
+local function shootBall()
+    local replicatedStorage = game:GetService("ReplicatedStorage")
+    local ballService = replicatedStorage:WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("BallService")
+
+    local args = {
+        [1] = shootVelocity,
+        [4] = Vector3.new(0, -50, -100),
+    }
+    ballService.RE.Shoot:FireServer(unpack(args))
+    print("Ball shot with speed: " .. shootVelocity)
+end
+
+-- การยิงบอลด้วยปุ่ม
+game:GetService("UserInputService").InputBegan:Connect(function(input, processed)
+    if input.UserInputType == Enum.UserInputType.Keyboard and input.KeyCode == Enum.KeyCode.One and not processed then
+        shootBall()  -- This will also call the shootBall function when the "1" key is pressed
+    end
+end)
